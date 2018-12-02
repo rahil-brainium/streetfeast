@@ -1,0 +1,39 @@
+<div style="padding: 20px;">
+  <div class="card" style="padding: 10px;">
+    <div class="container-fluid">
+      <div class ="new_blog">
+        <h1>Create a new blog</h1>
+        <%= form_for (@blog),url: "/blog/create_blog_user", :html => { :multipart => true } do |f| %>
+          <div class="field">
+            <%= f.text_field :title,:class=>"form-control",:placeholder => "Title" %>
+          </div>
+          <br>
+
+          <div class="field">
+            <%= f.text_area :content, :class => "tinymce",:placeholder => "Content" %>
+          </div>
+          <br>
+          <div class="field">
+            <%= f.fields_for @picture do |a|  %>
+              <b> Upload Images : </b>
+              <%= a.file_field :avatar , multiple: true %>
+            <% end %>
+          </div>
+          <br/>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary btn_large" >Create</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+<style type="text/css">
+  .card {
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border: 1px solid;
+    border-radius: 5px;
+    height: auto;
+}
+</style>

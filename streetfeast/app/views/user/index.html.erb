@@ -1,0 +1,165 @@
+<link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></link>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<select name="filters" id="blocked_user_filter">
+  <option value="" selected="selected">Blocked_user Filter</option>
+  <option value="true">Blocked</option>
+  <option value="false">Not Blocked</option>
+</select>
+
+<div style="padding: 10px;">
+  <table id="users_datatable" class="table table-hover display responsive no-wrap" data-source="<%= users_path(format: :json) %>">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">email</th>
+        <th scope="col">Mobile</th>
+        <th scope="col">City</th>
+        <th scope="col">State</th>
+        <th scope="col">Posts</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+        
+    </tbody>
+  </table>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+    $('#users_datatable').dataTable({
+      "serverSide": true,
+      "pagingType": "full_numbers",
+      "oLanguage": { "sSearch": ""},
+      "columnDefs": [
+        { "orderable": false, "targets": 6 },
+        { "orderable": false, "targets": 7 },
+        { "orderable": false, "targets": 0 },
+        { "orderable": false, "targets": 5 }
+      ],
+      "ajax":{
+        "url":$('#users_datatable').data('source'),
+        "data": function (d) {
+          d.is_blocked = $("#blocked_user_filter option:selected").val();
+        }
+      },
+      "preDrawCallback": function(settings) 
+      {
+        $('#users_datatable_filter input[type="search"]').attr("placeholder","Search");
+        $(".loader").show();
+      },
+      "initComplete": function(settings, json) {
+        $("#blocked_user_filter").insertBefore('#users_datatable_filter input[type="search"]');
+        
+        $('.is_block_test').each(function() {
+          if($(this).hasClass("unblock")){
+            $(this).closest("tr").addClass("table-warning");
+          }else{
+            $(this).addClass("block");
+          }
+        })
+
+      },
+      "drawCallback": function(settings) 
+      {
+        $(".loader").hide();
+        initialize_script();
+      }
+    });
+    $("#users_datatable_filter").on("change",function(){
+      $('#users_datatable').DataTable().ajax.reload(null,false);
+    });
+  });
+
+
+function initialize_script(){
+
+  $(".is_block_test").click(function(){
+    var user_id = $(this).data('id');
+    var is_blocked = $(this).hasClass("unblock");
+    if(is_blocked==false)
+    {
+      swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, block!'
+      }).then((result) =>
+      {
+        $(this).closest('tr').addClass("table-warning");
+        $(this).addClass("unblock").removeClass("block");
+        $.getScript('/home/blacklist.js?pt=' + user_id);
+      })
+    }
+    else
+    {
+      swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, block!'
+      }).then((result) => 
+      {
+        $(this).closest('tr').removeClass("table-warning");
+        $(this).addClass("block").removeClass("unblock");
+        $.getScript('/home/undo_blacklist.js?pt=' + user_id);
+      }) 
+    }
+  });
+}
+</script>
+<style>
+  .unblock
+  {
+    filter: grayscale(100%);
+    opacity: 0.7;
+  }
+
+  #example_wrapper .row:first-child{
+    margin-bottom: 24px;
+  }
+  #users_datatable_filter input[type="search"] {
+    border: 1px solid #aaa;
+    border-radius: 15px;
+    padding: 5px;
+    outline: none;
+    margin-right: 16px;
+}
+#blocked_user_filter{
+  margin-right: 576px;
+  float: left;
+}
+span.user_name {
+  margin-left: 5px;
+}
+a:hover{
+  text-decoration: none;
+}
+</style>

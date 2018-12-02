@@ -1,0 +1,26 @@
+<style type="text/css">
+    .card {
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border: 1px solid;
+    border-radius: 5px;
+    height: auto;
+}
+</style>
+<center>
+<div class="card bg-light mb-3" style="max-width: 26rem;margin-top: 5%;">
+  <div class="card-header"><h2>Send Invitation</h2></div>
+  <div class="card-body">
+    <%= form_for resource, :as => resource_name, :url => invitation_path(resource_name), :html => {:method => :post} do |f| %>
+      	<% resource.class.invite_key_fields.each do |field| -%>
+        <div class="form-group">
+        <br>
+          <%= f.text_field field, class: 'form-control', placeholder: "Email" %></p>
+        </div>
+        <% end -%>
+        <br>
+         <p><%= f.submit t("devise.invitations.new.submit_button") , :class => "btn btn-primary btn_large"%></p>
+    <%end%>
+  </div>
+</div>
+</center>

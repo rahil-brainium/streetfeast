@@ -1,0 +1,310 @@
+<link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></link>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="http://jonthornton.github.io/jquery-timepicker/jquery.timepicker.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tokenfield/0.12.0/bootstrap-tokenfield.js"></script>
+<div style="margin-left:227px" >
+  <div class="card bg-light mb-3" style="max-width: 40rem;">
+    <div class="card-header"><h3><center><strong><%= @restaurant.name.capitalize %></strong></center></h3></div>
+      <div class="card-body">
+        <%= form_for (@restaurant),:url =>"/restaurant/update/#{@restaurant.id}" ,:html => { :multipart => true } do |f| %>
+          <h3>Restaurant #<%= @restaurant.id %></h3>
+          <div class="field">
+            <%= f.text_field :name,:class=>"form-control",:placeholder => "Name" %>
+          </div>
+          <br>
+          <div class="field">
+            <%= f.text_area :description,:placeholder => "Description",:class=>"form-control" %>
+          </div>
+          <br>
+
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="field">
+                Blacklist : <%= f.check_box :is_blacklisted %>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="field">
+                Deactivate: &nbsp;<%= f.check_box :is_deactive %>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="row">  
+            <div class="col-sm-6">
+              <div class="field">
+                <%= f.text_field :cuisine,:class=>"form-control",:id=>"cuisine" %>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="field">
+                <%= f.text_field :associated_blogs,:class=>"form-control",:id=>"associated_blogs",:placeholder=>"Associated Blogs" %>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="field">
+                <%= f.text_field :operator,:class=>"form-control" ,:placeholder => "Operator"%>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="field">
+                <%= f.text_field :contact_number,:class=>"form-control" ,:placeholder => "Contact Number"%>
+              </div>
+            </div>
+          </div>
+          <br>
+          <% if @restaurant.addresses.present? %>
+            <%= f.fields_for @restaurant.addresses.first do |a|  %>
+              <div class="field">
+                  <%= a.text_area :address_line,:class=>"form-control" ,:style=>"min-height:120px;"%>
+              </div>
+              <br>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="field">
+                    <%= a.text_field :latitude,:class=>"form-control",:placeholder => "Latitude",:id=>"latitude"  %>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="field">
+                    <%= a.text_field :longitude,:class=>"form-control",:placeholder => "Longitude",:id=>"longitude"  %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+          <br>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="field">
+                <%= f.text_field :opening_time,:id =>"timepickeropen",:class=>"form-control" ,:placeholder => "Opening Time"%>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="field">
+                <%= f.text_field :closing_time,:id =>"timepickerclose",:class=>"form-control" ,:placeholder => "Closing Time"%>
+              </div>
+            </div>
+          </div>
+          <br>
+
+          <div class="field">
+            <%= button_tag "View menu",:id => "view_menu",:class=>"btn btn-success",:data=>{:toggle=>"modal",:target=> "#myModal2"} %>
+          </div>
+          <% if @restaurant.associated_blogs.present? %>
+            <br>
+            <div class="field">
+              <% blogs = @restaurant.associated_blogs.split(',') %>
+              <% blogs.each do |i| %>
+                <% b = Blog.where("id =?",i.to_i).first %>
+                  <% if b.pictures.present? %>
+                    <% b.pictures.each do |p| %>
+                    <img src = "<%= p.avatar %>" style="height: 100px;width: 100px;cursor: pointer;" class = "pic_show"  data-id = "<%= p.id %>" data-toggle="modal" data-target= "#myModal" data-remote = "true">
+                    <% end %>
+                  <% end %>
+                <% end %>
+              <br>
+            </div>
+          <% end %>
+          <br>
+          <% if @restaurant.addresses.present? %>
+            <div id="geolocation" style="width: 300px; height: 300px;"></div>
+          <br>
+          <% end %>
+          <button type="submit" class="btn btn-primary btn_large" >Update</button>&nbsp;&nbsp;
+        <% end %>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- modal for picture show/like -->
+<div id="myModal" class="modal" role="document" >
+  <div class="modal-dialog">
+    <div class="modal-content" style="width: 500px;height: 500px;">
+      <div class="modal-body">
+        <img src="" id = "modal-pic" style="width: 466px;height: auto;">
+        <hr>
+          <img src="/assets/pic_like.png" style="width: 20px;height: auto;cursor: pointer;" class="pic_like">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- Modal for menu_list -->
+<div id="myModal2" class="modal" role="document"> 
+  <div class="modal-dialog" style="max-width: 600px;" >
+    <div class="modal-content" >
+      <div class="modal-body2"  style="overflow-y: auto;max-height: 500px;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+  $('#cuisine').tokenfield({
+    autocomplete: {
+      source: ['Chinese','Moghlai','Desert','Indian','South Indian'],
+      delay: 100
+    },
+    showAutocompleteOnFocus: true
+  })
+
+  var geocoder = new google.maps.Geocoder();
+  if($("#restaurant_address_address_line").val()!=undefined)
+  {
+    var add =$("#restaurant_address_address_line").val().replace(/"/g,"");
+  }
+
+  geocoder.geocode( { 'address': add}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) 
+    {
+      var latitude = results[0].geometry.location.lat();
+      var longitude = results[0].geometry.location.lng();  
+      var map;
+      function initialize() 
+      {
+        var myLatlng = new google.maps.LatLng(latitude, longitude);
+        var myOptions = {
+            zoom: 15,
+            center: myLatlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById("geolocation"), myOptions);
+        var marker = new google.maps.Marker({
+            draggable: true,
+            position: myLatlng,
+            map: map
+        });
+        google.maps.event.addListener(marker, 'dragend', function (event) {
+
+          document.getElementById("latitude").value = event.latLng.lat();
+          document.getElementById("longitude").value = event.latLng.lng();
+          
+        });
+      }
+      google.maps.event.addDomListener(window, "load", initialize());
+    }
+  }); 
+  
+
+
+  $("#view_menu").on("click",function(e){  //  show modal for menu_list
+    e.preventDefault();
+    var id = <%= @restaurant.id %>
+    $.ajax({ 
+      async: true,
+      type: 'GET',
+      url: "/menu/"+id,
+      success: function(data)
+      {
+        $(".modal-body2").html(data);  
+      }, 
+      error: function(data){ alert('error'); } 
+    })
+  });
+
+
+
+
+  $(".pic_show").on("click",function(){  // show picture in modal
+
+    var id = $(this).data('id');
+
+    $.ajax({ 
+      async: true,
+      type: 'GET',
+      url: "/restaurant/pic/show/"+id,
+      success: function(data)
+      {
+        //alert(data.id);
+        $("#modal-pic").attr("src",data.pic);
+        $("#modal-pic").attr("data-id",data.id);  
+        //$("#pic_like").attr("data-id",data.id);
+        $(".pic_like").attr("id",data.id);
+
+        var is_liked = data.is_liked;
+        if(is_liked==true)
+          $("#"+data.id).attr("src","/assets/pic_unlike.png");
+        else
+          $("#"+data.id).attr("src","/assets/pic_like.png");
+
+      }, 
+      error: function(data){ alert('error'); } 
+    })
+  });
+
+  $('#timepickeropen').timepicker();
+  $('#timepickerclose').timepicker();
+  $(".pic_like").on("click",function()
+  {
+    var pic_id = $(".pic_like").attr("id");
+      $.ajax({ 
+      async: true,
+      type: 'GET',
+      url: "/like/pic_like/"+pic_id,
+      success: function(data)
+      {
+        if(data.is_liked == true)
+        {
+          $("#"+data.pic_id).attr("src","/assets/pic_unlike.png");
+        }
+         else
+        {
+          $("#"+data.pic_id).attr("src","/assets/pic_like.png");
+        }
+      }, 
+      error: function(data){ alert('error'); } 
+    })
+  });
+
+  $(function(){
+    $('#toggle-event-black_list').change(function() {
+    })
+  });
+
+</script>
+<style type="text/css">
+.modal-backdrop 
+  {
+    position: absolute;
+    right: 0;
+    left: 0;
+    opacity: 0.5;
+    height:100%; 
+    position: fixed;
+  }
+
+  .like_style
+  {
+    width: 20px;
+    height: auto;
+    cursor: pointer;
+  }
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border: 1px solid;
+    border-radius: 5px;
+    height: auto;
+}
+
+</style>

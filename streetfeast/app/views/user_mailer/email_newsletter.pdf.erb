@@ -1,0 +1,12 @@
+<b><h2><%= @blog_for_newsletter.title.html_safe %></h2></b>
+<b><h3><%= @blog_for_newsletter.content.html_safe %></h3></b>
+
+<% if @blog_for_newsletter.pictures.present? %>  
+  	<div class="row">
+      	<% @blog_for_newsletter.pictures.each do |picture| %>
+	  		<div class="col-md-3">
+	    		<%= wicked_pdf_image_tag "#{picture.avatar}" %>
+	    	</div>
+  		<% end %>
+    </div>
+<% end %>

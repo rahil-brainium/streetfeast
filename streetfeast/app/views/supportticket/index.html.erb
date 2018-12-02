@@ -1,0 +1,225 @@
+<link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></link>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<select name="filters" id="input_filter">
+  <option value="" selected="selected">Select filter</option>
+  <option value="resolved">Resolved</option>
+  <option value="not resolved">Not Resolved</option>
+</select>
+<div style="padding: 10px;">
+  <table id="tickets_datatable" class="table table-hover display responsive no-wrap" data-source="<%= support_tickets_path(format: :json) %>">
+    <thead>
+      <tr>
+        <th scope="col"><input type="checkbox" name="select_all_checkbox" id="select_all"></th>
+        <th scope="col">Issue ID</th>
+        <th scope="col">Issue Type</th>
+        <th scope="col">Issue Description</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+  <a class="btn btn-success right-align resolve_issue_btn" >Resolve issue</a>
+</div>
+
+<input type="text" value="" name="HIIIII"  class="input_filter" style="display: none;">
+<div id="myModal" class="modal" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div> 
+<script>
+
+  jQuery(document).ready(function() 
+  {
+
+    var table = $('#tickets_datatable').dataTable({
+      "serverSide": true,
+      "pagingType": "full_numbers",
+      "oLanguage": { "sSearch": ""},
+      "columnDefs": [
+        { "orderable": false, "targets": 0 },
+        { "orderable": false, "targets": 2 },
+        { "orderable": false, "targets": 4 },
+        { "orderable": false, "targets": 5 }
+      ],
+      "ajax":{
+        "url":$('#tickets_datatable').data('source'),
+        "data": function (d) {
+          d.is_resolved = $("#input_filter option:selected").val();
+        }
+      },
+      "preDrawCallback": function(settings) 
+      {
+        $('#tickets_datatable_filter input[type="search"]').attr("placeholder","Search");
+        $(".loader").show();
+      },
+      "initComplete": function(settings, json) {
+        $("#input_filter").insertBefore('#tickets_datatable_filter input[type="search"]');
+
+      },
+      "drawCallback": function(settings) 
+      {
+        $(".loader").hide();
+        initialize_script();
+        count_rows =0;
+        var x = $('#select_all').prop('checked');
+        if(x==true)
+        {
+          $('#select_all').prop('checked',false);
+        }
+      },
+    });
+    $("#input_filter").on("change",function(){
+      $('#tickets_datatable').DataTable().ajax.reload(null,false);
+    });
+  });
+
+  var issue_id = [];
+  var count_rows=0;
+  var c_rows;
+  function initialize_script()
+  {
+    
+    $('#select_all').on("click",function() {
+      var rows,checked,each_issue_id;
+      issue_id=[];
+      rows = $('#tickets_datatable').find('tbody tr').find('input');
+      c_rows = rows.length;
+      count_rows=rows.length;
+      checked = $(this).prop('checked');
+      
+      $( ".is_checked_resolved" ).each(function() {
+        $(this).prop('checked',checked);
+        each_issue_id =$(this).attr("data-id") ;
+        if(checked==true)
+        {
+          issue_id.push(parseInt(each_issue_id));
+        }
+        else
+        {
+          issue_id.pop();
+          count_rows--;
+          if(c_rows!=count_rows){
+            $('#select_all').attr('checked',false);
+          }
+        }
+      });
+
+    });
+
+    $(".is_checked_resolved").on("click",function()
+    {
+      rows = $('#tickets_datatable').find('tbody tr').find('input');
+      c_rows = rows.length;
+      var id = $(this).data('id');
+      var x = $("#st_"+id).prop('checked');
+      if(x == false)
+      {
+        var index = issue_id.indexOf(id);
+        if (index !== -1) 
+          issue_id.splice(index, 1);
+        count_rows--;
+
+        if(c_rows!=count_rows){
+          var ch = $('#select_all');
+          ch.prop('checked', false);
+        }
+      }
+      else
+      {
+        issue_id.push(id);
+        count_rows++;
+        if(c_rows == count_rows){
+          var ch = $('#select_all');
+          ch.prop('checked', true);
+        }
+      }
+    });
+
+    $(".resolve_issue_btn").on("click",function(e){
+
+      e.preventDefault();
+      $.ajax({ 
+        async: true,
+        type: 'GET',
+        url: "/support_ticket/resolve",
+        data: {issue_ids: issue_id},
+        success: function(data)
+        {
+          if(data=="success")
+          {
+            for (i = 0; i < issue_id.length; i++) 
+            { 
+              swal("Issues resolved!","", "success");
+              $("#select_all").prop("checked",false);
+              $(".is_resolved_"+issue_id[i]).attr("src","/assets/resolved_ticket.png")
+              $("#st_"+issue_id[i]).remove();
+              $(".is_resolved_"+issue_id[i]).css("display","");
+            }
+            issue_id=[];
+          }  
+          else
+          {
+            swal("Please select issue to be resolved","", "error");
+          }
+        }, 
+        error: function(data){ alert('error'); } 
+      })
+    });
+
+    $(".show_ticket").click(function(e)
+    { 
+      var id = $(this).attr('id'); 
+      $.ajax({ 
+        async: true,
+        type: 'GET',
+        url: "/support_ticket/show/"+id,
+        success: function(data)
+        {
+          $(".modal-body").html(data);  
+          $(".modal").show();
+        }, 
+        error: function(data){ alert('error'); } 
+      })
+    });
+    $(".close").on("click",function(){
+      $(".modal").hide();
+    });
+  }
+</script>
+<style type="text/css">
+  .modal-backdrop
+  {
+    position: absolute;
+    right: 0;
+    left: 0;
+    opacity:0.5 !important;
+    height:100% 
+  }
+
+#tickets_datatable_filter input[type="search"] {
+    border: 1px solid #aaa;
+    border-radius: 15px;
+    padding: 5px;
+    outline: none;
+    margin-right: 16px;
+}
+#input_filter{
+  margin-right: 30px;
+}
+#tickets_datatable_length{
+  margin-left: 10px;
+}
+table.dataTable th.select-checkbox:before { border-color: white; }
+table.dataTable tr.selected th.select-checkbox:after { text-shadow: none; font-weight: normal;}
+
+</style>

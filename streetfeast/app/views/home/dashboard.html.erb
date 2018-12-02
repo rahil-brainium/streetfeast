@@ -1,0 +1,99 @@
+<link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></link>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://js.braintreegateway.com/web/dropin/1.11.0/js/dropin.min.js"></script>
+<div style="padding: 10px;">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="btn btn-outline-primary">
+        <%= link_to("Send Invitation",new_user_invitation_path) %>
+      </div>
+      <div class="btn btn-outline-primary">
+        <%= link_to("Send SMS","/home/new_sms") %>
+      </div>
+      <% if current_user.fullname && current_user.mobile_no.present? && current_user.state.present? && current_user.city.present? %>
+        <div class="btn btn-outline-primary">
+          <%= link_to("Edit profile","/user/#{current_user.id}/edit") %>
+        </div>
+      <% else %>
+        <div class="btn btn-outline-primary">
+          <%= link_to("Update profile","/user/#{current_user.id}/edit") %>
+        </div>
+      <% end %>
+    </div>
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-success" style="margin-left: 400px;">Analytics Report</button>
+    </div>
+  </div>
+  <a class="btn btn-warning" href="/blog/new">Create a Blog</a>
+  
+</div>
+
+<script> 
+  $(".show_issue").on("click",function(){
+    window.open("/support_tickets","_self")
+  }) 
+
+  $(".menu_item").click(function(){
+    $(".menu_item").removeClass("active");
+    $(this).addClass("active");
+  });
+
+  $(document).ready(function(){
+    $(".onactive").addClass("active");
+    $(".onactive").trigger("click");
+    $("#users_dropdown").hide();
+    $("#blogs_dropdown").hide();
+    $("#restaurants_dropdown").hide();
+  });
+
+
+
+  function users_dropdown()
+  {
+    $("#users_dropdown").slideToggle();
+  }
+
+  $("#show_submenu").on("click",function()
+  {
+    $("#blogs_dropdown").slideToggle();
+  })
+
+  function restaurants_dropdown()
+  {
+    $("#restaurants_dropdown").slideToggle();
+  }
+
+
+
+
+  function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  .size-mid
+  {
+    width: 66px;
+  }
+  
+  a:hover{
+    text-decoration: none;
+  }
+
+</style>                                                      

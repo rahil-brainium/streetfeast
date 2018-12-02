@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <p><b>Name :</b> <%= @user.fullname %></p>
+    <p><b>Email :</b> <%= @user.email %></p>
+    <p><b>Phone number : </b><%= @user.mobile_no %></p>
+    <p><b>Issue ID </b> <%= @support_ticket.id %></p>
+    <p><b>Issue type :</b> <%= @issue_type.issue_type %></p>
+    <% if @support_ticket.issue_description.present? %> 
+      <p><b>Issue description :</b><%= @support_ticket.issue_description %></p> 
+    <% end %>
+  </body>
+</html>

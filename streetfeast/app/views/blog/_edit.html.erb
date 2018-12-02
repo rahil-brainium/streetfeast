@@ -1,0 +1,116 @@
+<style type="text/css">
+  .uploadpic{
+    display: none;
+  }
+</style>
+<%= tinymce%>
+<%= form_for (@blog),url: "/blog/update/#{@blog.id}", :html => { :multipart => true },:id =>"editblog",:remote => true,"data-id" => "#{@blog.id}" do |f| %>
+  <div class="field">
+    <%= f.text_field :title,:class=>"form-control",:placeholder => "Title" %>
+  </div>
+  <br>
+  <div class="field">
+    <%= f.text_area :content, :class => "tinymce" %>
+  </div>
+  <div class="field">
+    <%= f.fields_for @picture do |a|  %>
+      <%= a.file_field :avatar,:class => "uploadpic",:id => "upload_pic"%>
+    <% end %>
+  </div>
+  <br/>
+  <div>
+    <% @blog.pictures.each do |p| %>
+      <img src="<%= p.avatar %>" id = "<%=p.id %>" style="height: 100px;width: 100px;"> &nbsp;&nbsp;&nbsp;
+    <% end %>
+  </div>
+  <br>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary btn_large" >Update</button>
+  </div>
+<% end %>
+<script type="text/javascript">
+  tinymce.remove();
+  tinymce.init({ selector: ".tinymce" })
+
+
+  $(".edit_blog").on("submit", function(event){ 
+    var id = <%= @blog.id %>
+    $.ajax({ type: "POST",
+     url: this.action,
+      data: $(this).serialize(), 
+      success: function(response) 
+      {
+          text_truncate = function(str, length, ending)
+           {
+            if (length == null) {
+              length = 100;
+            }
+            if (ending == null) {
+              ending = '...';
+            }
+            if (str.length > length) {
+              return str.substring(0, length - ending.length) + ending;
+            } else {
+              return str;
+            }
+          };
+        $('.modal-backdrop').remove();
+        $('.modal').hide();
+        $('.blog_title_'+id).html(response.title);
+        $('.blog_content_'+id).html(text_truncate(response.content,30,"..."));
+      } 
+    }); 
+    event.preventDefault(); 
+  }); 
+
+
+  // $(".add_image_blog").on("click",function(event){
+
+
+
+  //   //var file_data = $(".uploadpic").prop("files")[0];
+  //   $(".uploadpic").trigger("click");
+  //   var x= $(".uploadpic").val();
+  //   //$("#upload_pic").removeClass("uploadpic");
+  //   console.log(x);
+
+
+
+  //   //var x = $("#upload_pic").val();
+  //   //alert(x)
+  //   //$("#upload_pic").addClass("uploadpic");
+
+  //   //var files = document.getElementById("upload_pic").files;
+  //   //var length = files.length;
+
+
+  //   //var files = $(".uploadpic").val();
+
+  //   //var fl = files.length;
+
+  //   //alert(files);
+
+
+  //   //alert(image);
+  //   //alert(JSON.stringify(file_data));
+  //   //alert(JSON.stringify(x));
+  //   // $.ajax({ 
+  //   //   type: "POST",
+  //   //   url: "/blog/add_picture_to_blog",
+  //   //   data: {'blog_id' :<%= @blog.id %>,'pic' :JSON.stringify(x)}, 
+  //   //   success: function(response) 
+  //   //   {
+  //   //     alert(response);       
+  //   //   } 
+  //   // }); 
+  // });
+</script>
+
+
+
+
+
+
+
+
+

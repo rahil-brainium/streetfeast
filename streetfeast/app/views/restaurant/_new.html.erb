@@ -1,0 +1,242 @@
+<script type="text/javascript" src="http://jonthornton.github.io/jquery-timepicker/jquery.timepicker.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tokenfield/0.12.0/bootstrap-tokenfield.js"></script>
+<style type="text/css">
+  .ui-autocomplete{z-index: 9999999}
+</style>
+<%= form_for (@restaurant),url: "/restaurant/create" do |f| %>
+  <%= hidden_field_tag :blog_id, @blog_id %>
+  <div class="field">
+    <%= f.text_field :name,:class=>"form-control",:placeholder => "Name", autofocus: true ,:required=>true%>
+  </div>
+  <br>
+  <div class="field">
+    <%= f.text_area :description,:placeholder => "Description",:class=>"form-control",:required=>true %>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="field">
+        <%= f.text_field :closed_on,:class=>"form-control",:placeholder => "Closed On",:id=>"closed_on" %>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="field">
+        <%= f.text_field :cost_for_two,:class=>"form-control" ,:placeholder => "Cost for two",:required=>true%>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="field">
+        <%= f.text_field :opening_time,:id =>"timepickeropen",:class=>"form-control" ,:placeholder => "Opening Time"%>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="field">
+        <%= f.text_field :closing_time,:id =>"timepickerclose",:class=>"form-control" ,:placeholder => "Closing Time"%>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="field">
+    <%= f.text_field :cuisine,:class=>"form-control",:placeholder => "Cuisine",:id=>"cuisine"%>
+  </div>
+  <br>
+  <div class="field">
+    <%= f.text_field :operator,:class=>"form-control",:placeholder => "Operator",:required=>true %>
+  </div>
+  <br>
+  <%= f.fields_for @address do |a|  %>
+    <div class="field">
+      <%= a.text_area :address_line,:class=>"form-control",:placeholder => "Address",:required=>true%>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="field">
+          <%= a.text_field :latitude,:class=>"form-control",:placeholder => "Latitude",:id=>"latitude"%>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="field">
+          <%= a.text_field :longitude,:class=>"form-control",:placeholder => "Longitude" ,:id =>"longitude" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <hr>
+
+  <strong>Menu</strong>
+  <br>
+  <div class="menu_list">
+    <%= f.fields_for @menu do |menu|  %>
+      <div class="row">
+        <div class="col-sm-6">
+            <div class="field">
+              <%= menu.text_field :item_name,:class=>"form-control",:placeholder => "Item name",:id=>"item_name"%>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="field">
+              <%= menu.text_field :price,:class=>"form-control",:placeholder => "Price" ,:id =>"price" %>
+            </div>
+          </div>
+      </div>
+      <br>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= button_tag "Add more",:id => "add_more",:class=>"btn btn-danger" %>
+  </div>
+  <hr>
+ 
+  <br>
+  <div class="row">
+    <div class="col-sm-10">
+      <div class="field">
+        <a><input id="search-input" class="form-control" type="text" placeholder="Search Location"></a>
+      </div>
+    </div>
+    <div class="col-sm-2">
+      <div class="field">
+        <img src="/assets/search.png" style="height: 25px;width: 25px;" id="search">
+      </div>
+    </div>
+  </div>
+  <br>
+    <div id="map_canvas" style="width: auto; height: 250px;" class="map_location"></div>
+  <br>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary btn_large" style="width: 150px;" >Add</button>
+  </div>
+<% end %>
+<script type="text/javascript">
+  $( document ).ready(function() {
+    $(".map_location").hide(); 
+    $("#item_name").last().attr("name","menu_item_name[item_name1]");
+    $("#price").last().attr("name","menu_item_price[price1]");
+  });
+
+  $('#timepickeropen').timepicker();
+  $('#timepickerclose').timepicker();
+
+  
+  $('#closed_on').tokenfield({
+    autocomplete: {
+      source: ['Sunday','Monday','Tuesday','Wednesday','Thrusday','Friday','Saturday'],
+      delay: 100
+    },
+    showAutocompleteOnFocus: true
+  })
+  $('#cuisine').tokenfield({
+    autocomplete: {
+      source: ['Chinese','Moghlai','Desert','Indian','South Indian'],
+      delay: 100
+    },
+    showAutocompleteOnFocus: true
+  })
+
+
+  $("#search").on("click",function(){
+    var geocoder = new google.maps.Geocoder();
+    $(".map_location").show();  
+    var add = $("#search-input").val();
+    geocoder.geocode( { 'address': add}, function(results, status) {
+
+      if (status == google.maps.GeocoderStatus.OK) 
+      {
+        var latitude = results[0].geometry.location.lat();
+        var longitude = results[0].geometry.location.lng();  
+        // alert(latitude);
+        // alert(longitude);
+        var map;
+        function initialize() 
+        {
+          var myLatlng = new google.maps.LatLng(latitude, longitude);
+
+          var myOptions = {
+              zoom: 15,
+              center: myLatlng,
+              mapTypeId: google.maps.MapTypeId.ROADMAP
+          };
+          map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+          var marker = new google.maps.Marker({
+              draggable: true,
+              position: myLatlng,
+              map: map
+          });
+
+          google.maps.event.addListener(marker, 'dragend', function (event) 
+          {
+            document.getElementById("latitude").value = event.latLng.lat();
+            document.getElementById("longitude").value = event.latLng.lng();
+          });
+        }
+        google.maps.event.addDomListener(window, "load", initialize());
+      }
+    }); 
+  });
+
+
+
+
+  $("#add_menu").on("click",function(e){
+    e.preventDefault();
+    $(".menu_list").show();
+    $("#menu").hide();
+    $("#add_more").show();
+  });
+
+  $("#add_more").on("click",function(e){
+    e.preventDefault();
+    max_field = 10;
+    x=1;
+    var field_len = $('.menu_list').length;
+    if(x<=max_field){
+      x++;
+      var html = $(".menu_list").first().clone();
+      $(".menu_list").last().after(html);
+      $('#item_name').val('');
+      $('#price').val('');
+      //alert(field_len+1);
+      $("#item_name").last().attr("name","menu_item_name[item_name"+(field_len+1)+"]");
+      $("#price").last().attr("name","menu_item_price[price"+(field_len+1)+"]");
+    }
+  })
+
+   $("#new_restaurant").on("submit", function(event)
+  {
+    event.preventDefault();
+    $('.menu_list').each(function(index)
+    {
+      var item_price = $('[name="menu_item_price[price'+(index+1)+']"]').val();
+      var item_name =  $('[name="menu_item_name[item_name'+(index+1)+']"]').val();
+      if(item_name=="" && item_price==""){
+        alert("Put item name and item price before submitting!!!");
+      }
+      else if (item_name!="" && item_price=="")
+      {
+        alert("Please put item price!!")
+      }
+      else if(item_price!="" && item_name==""){
+        alert("please put item name!!!");
+      }
+      else
+      {
+        $.ajax({ 
+          type: "POST", 
+          url: $("#new_restaurant").attr('action'), 
+          data: $("#new_restaurant").serialize(),
+          success: function(response) 
+          { 
+
+          } 
+        });
+        return false;
+      }
+    });
+  });
+</script>

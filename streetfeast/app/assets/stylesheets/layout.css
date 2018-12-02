@@ -1,0 +1,152 @@
+body  {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+a {
+  text-decoration: none;
+  color: #202f4c;
+}
+
+.cta {
+  font-size: 20px;
+  font-weight: 500;
+  border: 2px solid #000;
+  border-radius: 4px;
+  padding: 8px 22px;
+  display: inline-block;
+  margin-top: 10px;
+  color: #000;
+}
+.cta:hover {
+  background: #FDD116;
+  color: #000;
+  text-decoration: none;
+}
+
+.navbar {
+  margin-bottom: 0;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  border-radius: 0;
+}
+.navbar-default {
+  background: #FDD116 url(../img/bg.png);
+  border: 0;
+  font-size: 16px;
+}
+  .navbar-default .navbar-nav {
+    margin-top: 16px;
+  }
+    .navbar-default .navbar-nav>li>a {
+      color: #000;
+    }
+    .navbar-default .navbar-nav>li>a:hover {
+      background: #E4B906;
+      border-radius: 5px;
+    }
+    .nav .nav-cta {
+      border: 2px solid #000;
+      border-radius: 5px;
+      margin-left: 10px;
+    }
+    .nav .nav-cta:hover {
+      background: #FDD116 !important;
+    }
+  .navbar-default .navbar-toggle {
+    border-color: #5A5A5A;
+    margin-top: 21px;
+  }
+  .navbar-default .navbar-toggle:hover,
+  .navbar-default .navbar-toggle:focus {
+    background-color: #F4C500;
+  }
+    .navbar-default .navbar-toggle .icon-bar {
+      background-color: #676767;
+    }
+  .navbar-collapse {
+    border: 0;
+  }
+
+.page-header {
+  border: 0;
+  background: #F4DF85;
+  margin: 0;
+  padding: 15px 0;
+  font-size: 30px;
+  font-weight: 300;
+  margin-bottom: 30px;
+}
+  .page-header a:hover {
+    color: #202f4c;
+    text-decoration: none;
+  }
+
+#intro {
+  background: #FDD116 url(../img/bg.png);
+  padding: 30px 80px 0 80px;
+  color: #000;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+  #intro .subtext {
+    font-size: 20px;
+    margin-top: 20px;
+  }
+  #intro .screenshot {
+    text-align: right;
+  }
+    #intro .screenshot img {
+      -webkit-box-shadow: 1px 0px 9px 0px rgba(50, 50, 50, 0.75);
+      -moz-box-shadow:    1px 0px 9px 0px rgba(50, 50, 50, 0.75);
+      box-shadow:         1px 0px 9px 0px rgba(50, 50, 50, 0.75);
+      width: 730px;
+    }
+  #intro .screencast {
+    display: relative;
+  }
+    #intro .screencast > i.glyphicon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -50px 0 0 -50px;
+      font-size: 100px;
+      color: #4D4D4D;
+    }
+    #intro .screencast:hover > i.glyphicon {
+      color: #000;
+    }
+
+@media (max-width: 991px) {
+  #intro {
+    padding: 20px;
+  }
+}
+
+
+#footer {
+  margin-top: 80px;
+  background: #FDD116 url(../img/bg.png);
+  text-align: center;
+  padding: 30px 0;
+}
+  #footer a:hover {
+    color: #202f4c;
+  }
+  #footer .links a {
+    display: inline-block;
+    margin-left: 10px;
+  }
+  #footer .links a:first-child {
+    margin-left: 0;
+  }
+  #footer .digicoop a {
+    border-bottom: 1px dotted #000;
+  }
+  #footer .digicoop a:hover {
+    border-bottom: 1px solid #000;
+    text-decoration: none;
+  }

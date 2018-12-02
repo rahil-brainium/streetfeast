@@ -1,0 +1,21 @@
+<center>
+  <div class="card bg-light mb-3" style="max-width: 26rem;margin-top: 5%;">
+    <div class="card-header"><b>Send SMS</b></div>
+    <div class="card-body">
+      <%= form_for :sms_user, url: "/home/send_sms" do |form| %>
+        <%= form.text_field :mobile_number,:class=>"form-control",:placeholder=>"Mobile Number",:style=>"margin-bottom:10px;" %>
+        <%= form.text_area :message,:class=>"form-control",:placeholder=>"Message",:style=>"margin-bottom:10px;" %>
+        <%= form.submit('Send',:class=>"btn btn-primary")  %>
+      <% end  %>
+    </div>
+  </div>
+</center>
+<style type="text/css">
+    .card {
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border: 1px solid;
+    border-radius: 5px;
+    height: auto;
+}
+</style>

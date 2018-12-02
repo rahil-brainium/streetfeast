@@ -1,0 +1,160 @@
+<link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></link>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<select name="filters" id="reviewed_filter">
+  <option value="" selected="selected">Review Filter</option>
+  <option value="true">Reviewed</option>
+  <option value="false">Not Reviewed</option>
+</select>
+<select name="filters" id="blocked_filter">
+  <option value="" selected="selected">Block Filter</option>
+  <option value="true">Blocked</option>
+  <option value="false">Not Blocked</option>
+</select>
+
+
+
+<div style="padding: 10px;">
+  <table id="blog_datatable" class="table table-hover display responsive no-wrap" data-source="<%= blogs_path(format: :json) %>">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Title</th>
+        <th scope="col">Content</th>
+        <th scope="col">Email</th>
+        <th scope="col">Pictures</th>
+        <th scope="col">Created at</th>
+        <th scope="col">Updated At </th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    </tbody>
+  </table> 
+</div>
+<div id="myModal" class="modal" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Modal Header</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+      </div>
+    </div>
+  </div>
+</div>
+<%= tinymce %>
+<script>
+  jQuery(document).ready(function() 
+  {
+    $('#blog_datatable').dataTable({
+      "serverSide": true,
+      "pagingType": "full_numbers",
+      "oLanguage": { "sSearch": ""},
+       "columnDefs": [
+        { "orderable": false, "targets": 4 },
+        { "orderable": false, "targets": 2 },
+        { "orderable": false, "targets": 0 },
+        { "orderable": false, "targets": 3 },
+        { "orderable": false, "targets": 7 }
+      ],
+      "ajax":{
+        "url":$('#blog_datatable').data('source'),
+        "data": function (d) {
+          d.is_reviewed = $("#reviewed_filter option:selected").val();
+          d.is_blocked = $("#blocked_filter option:selected").val();
+        }
+      },
+      "preDrawCallback": function(settings) 
+      {
+        $('#blog_datatable_filter input[type="search"]').attr("placeholder","Search");
+        $(".loader").show();
+      },
+      "initComplete": function(settings, json) {
+        $("#reviewed_filter").insertAfter('#blog_datatable_length');
+        $("#blocked_filter").insertAfter('#reviewed_filter');
+        
+      },
+      "drawCallback": function(settings) 
+      {
+        initialize_script();
+        $(".loader").hide();
+      },
+    });
+    $("#reviewed_filter").on("change",function(){
+      $('#blog_datatable').DataTable().ajax.reload(null,false);
+    });
+
+
+    $("#blocked_filter").on("change",function(){
+      $('#blog_datatable').DataTable().ajax.reload(null,false);
+    });
+  });
+
+  function show(id)
+  {
+    window.location = "/blog/"+id;
+  }
+function initialize_script()
+{
+  $(".blog_edit").click(function(e)
+  { 
+    var id = $(this).attr('id');
+    $.ajax({ 
+      async: true,
+      type: 'GET',
+      url: "/blog/"+id+"/edit",
+      success: function(data)
+      {
+        $(".modal-body").html(data);
+        $(".modal").show();  
+      }, 
+      error: function(data){ alert('error'); } 
+    })
+  });
+  
+  $(".close").on("click",function(){
+    $(".modal").hide();  
+  })
+}
+</script>
+
+<style>
+
+.modal-backdrop {
+  position: absolute;
+  right: 0;
+  left: 0;
+  opacity: 0.5;
+  height:100% 
+  }
+  #example_wrapper .row:first-child{
+    margin-bottom: 24px;
+  }
+#blog_datatable_filter input[type="search"] {
+    border: 1px solid #aaa;
+    border-radius: 15px;
+    padding: 5px;
+    outline: none;
+    margin-right: 16px;
+}
+#reviewed_filter{
+  float: left;
+  margin-left: 18px;
+}
+#blocked_filter{
+  margin-left: 25px;
+}
+.reset_filters{
+  margin-left: 25px;
+}
+.modal-body{
+  height: 500px;
+  overflow-y: auto;
+}
+.modal-dialog{
+  overflow-y: initial !important
+}
+</style>

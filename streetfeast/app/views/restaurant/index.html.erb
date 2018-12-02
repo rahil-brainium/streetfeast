@@ -1,0 +1,137 @@
+<link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></link>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tokenfield/0.12.0/css/bootstrap-tokenfield.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tokenfield/0.12.0/css/tokenfield-typeahead.css">
+<select name="filters" id="closed_on_filter">
+  <option value="" selected="selected">Closed On</option>
+  <option value="Sunday">Sunday</option>
+  <option value="Monday">Monday</option>
+  <option value="Tuesday">Tuesday</option>
+  <option value="Wednesday">Wednesday</option>
+  <option value="Thursday">Thursday</option>
+  <option value="Friday">Friday</option>
+  <option value="Saturday">Saturday</option>
+</select><select name="filters" id="cuisine_filter">
+  <option value="" selected="selected">Cuisine Type</option>
+  <option value="Chinese">Chinese</option>
+  <option value="Mughlai">Mughlai</option>
+  <option value="Desert">Desert</option>
+  <option value="South Indian">South Indian</option>
+</select>
+<select name="filters" id="blacklisted_filter">
+  <option value="" selected="selected">Blacklisted Filter</option>
+  <option value="true">Blacklisted</option>
+  <option value="false">Not Blacklisted</option>
+</select>
+<select name="filters" id="deactive_filter">
+  <option value="" selected="selected">Deactive Filter</option>
+  <option value="true">Deactive</option>
+  <option value="false">Not Deactive</option>
+</select>
+
+
+<div style="padding: 10px;">
+  <table id="restaurants_datatable" class="table table-hover display responsive no-wrap" data-source="<%= restaurants_path(format: :json) %>">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Contact Number</th>
+        <th scope="col">Operator</th>
+        <th scope="col">Cuisine</th>
+        <th scope="col">Timings</th>
+        <th scope="col">Closed On</th>
+        <th scope="col">Address</th>
+        <th scope="col">Associated Blogs</th>
+      </tr>
+    </thead>
+    <tbody>  
+    </tbody>
+  </table> 
+</div>
+<script>
+  jQuery(document).ready(function() 
+  {
+    $('#restaurants_datatable').dataTable({
+      "serverSide": true,
+      "pagingType": "full_numbers",
+      "oLanguage": { "sSearch": ""},
+      "columnDefs": [
+        { "orderable": false, "targets": 1 },
+        { "orderable": false, "targets": 3 },
+        { "orderable": false, "targets": 4 },
+        { "orderable": false, "targets": 5 },
+        { "orderable": false, "targets": 6 },
+        { "orderable": false, "targets": 7 }
+
+      ],
+      "ajax":{
+        "url":$('#restaurants_datatable').data('source'),
+        "data": function (d) {
+          d.cuisine = $("#cuisine_filter option:selected").val();
+          d.closed_on = $("#closed_on_filter option:selected").val();
+          d.is_blacklisted = $("#blacklisted_filter option:selected").val();
+          d.is_deactive = $("#deactive_filter option:selected").val();
+        }
+      },
+      "preDrawCallback": function(settings) 
+      {
+        $('#restaurants_datatable_filter input[type="search"]').attr("placeholder","Search");
+        $(".loader").show();
+      },
+      "initComplete": function(settings, json) {
+        $("#cuisine_filter").insertBefore('#restaurants_datatable_filter input[type="search"]');
+        $("#closed_on_filter").insertBefore('#restaurants_datatable_filter');
+        $("#blacklisted_filter").insertBefore('#restaurants_datatable_filter');
+        $("#deactive_filter").insertBefore('#restaurants_datatable_filter');
+
+      },
+      "drawCallback": function(settings) 
+      {
+        $(".loader").hide();
+      },
+    });
+    $("#cuisine_filter").on("change",function(){
+      $('#restaurants_datatable').DataTable().ajax.reload(null,false);
+    });
+    $("#closed_on_filter").on("change",function(){
+      $('#restaurants_datatable').DataTable().ajax.reload(null,false);
+    });
+    $("#blacklisted_filter").on("change",function(){
+      $('#restaurants_datatable').DataTable().ajax.reload(null,false);
+    });
+    $("#deactive_filter").on("change",function(){
+      $('#restaurants_datatable').DataTable().ajax.reload(null,false);
+    });
+  });
+
+  function show(id)
+  {
+    window.location = "/restaurant/"+id;
+  }
+</script>
+<style type="text/css">
+  #restaurants_datatable_filter input[type="search"] {
+    border: 1px solid #aaa;
+    border-radius: 15px;
+    padding: 5px;
+    outline: none;
+    margin-right: 16px;
+}
+#cuisine_filter{
+  margin-right: 192px;
+  float: left;
+}
+#closed_on_filter{
+  margin-left: 17px;
+  float: left;
+}
+#blacklisted_filter{
+  margin-left: 25px;
+}
+#restaurants_datatable_length{
+  margin-left: 10px;
+}
+#deactive_filter{
+      margin-left: 25px;
+}
+</style>

@@ -1,0 +1,67 @@
+#story h2 {
+  text-align: center;
+  margin-bottom: 18px;
+}
+#story p {
+  font-size: 20px;
+  line-height: 1.5;
+  margin: 10px 30px 10px 30px;
+  text-align: center;
+  line-height: 30px;
+}
+
+#screenshots {
+  margin: 40px 20px 60px;
+}
+  #screenshots img {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    -webkit-box-shadow: 1px 0px 9px 0px rgba(50, 50, 50, 0.4);
+    -moz-box-shadow:    1px 0px 9px 0px rgba(50, 50, 50, 0.4);
+    box-shadow:         1px 0px 9px 0px rgba(50, 50, 50, 0.4);
+  }
+
+
+#features p {
+  font-weight: 300;
+  font-size: 16px;
+}
+#features .primary {
+  background: #FDD116 url(../img/bg.png);
+  padding: 20px 0 30px;
+}
+  #features .primary h3 {
+    font-size: 30px;
+  }
+  #features .primary p {
+    font-size: 18px;
+  }
+#features > .container > .row {
+  margin-top: 20px;
+}
+
+#pricing {
+  margin-top: 50px;
+}
+  #pricing h2 {
+    text-align: center;
+    font-size: 35px;
+  }
+  #pricing .personal {
+    text-align: center;
+  }
+    #pricing .personal .pricing {
+      font-size: 40px;
+    }
+    #pricing .personal .features {
+      font-size: 25px;
+    }
+  #pricing .business {
+    margin-top: 50px;
+    text-align: center;
+    color: #938F81;
+  }
+    #pricing .business h3 {
+      font-size: 25px;
+    }

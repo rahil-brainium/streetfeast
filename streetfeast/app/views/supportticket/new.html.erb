@@ -1,0 +1,31 @@
+<center>
+  <div class="card bg-light mb-3" style="max-width: 26rem;">
+    <div class="card-header"><h2>Submit Issue</h2></div>
+    <div class="card-body">
+      <div class ="new_blog">
+        <br>
+        <%= form_for (@support_ticket),url: "/support_ticket/create", :html => { :multipart => true } do |f| %>
+          <div class="form-group">
+            <%= select_tag 'support_ticket[issue_type]',content_tag(:option,'Select Issue Type',:value=>"")+ options_from_collection_for_select(IssueType.all, 'id', 'issue_type'),:class=>"form-control" %>
+          </div>
+          <div class="field">
+            <%= f.text_area :issue_description,:class=>"form-control",:placeholder => "Issue" %>
+          </div>
+          <br>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary btn_large" >Submit</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</center>
+<style type="text/css">
+    .card {
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border: 1px solid;
+    border-radius: 5px;
+    height: auto;
+}
+</style>

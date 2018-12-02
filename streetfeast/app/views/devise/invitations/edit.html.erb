@@ -1,0 +1,42 @@
+<center>
+  <div class="card bg-light mb-3" style="max-width: 26rem;">
+    <div class="card-header">SET YOUR PASSWORD</div>
+      <div class="card-body">
+          <%= form_for resource, :as => resource_name, :url => invitation_path(resource_name), :html => { :method => :put } do |f| %>
+              <%= devise_error_messages! %>
+              <%= f.hidden_field :invitation_token %>
+              <% if f.object.class.require_password_on_accepting %>
+                <fieldset>
+                  <div class="form-group">
+                    <%= f.password_field :password, class: 'form-control', placeholder: "Password" %>
+                  </div>
+                  <div class="form-group">
+                    <%= f.password_field :password_confirmation , class: 'form-control', placeholder: "Password confirmation"%>
+                  </div>
+              <% end %>
+              </fieldset>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary btn_large">Set Password</button>
+              </div>
+          <% end %>
+         </div>
+      </div>
+  </div>
+</center>
+
+<style>
+.btn_large
+{
+  width: 200px;
+}
+  
+</style>
+<style type="text/css">
+    .card {
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border: 1px solid;
+    border-radius: 5px;
+    height: auto;
+}
+</style>

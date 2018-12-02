@@ -1,0 +1,35 @@
+<div style="padding: 10px;" >
+  <div class="field">
+    <h5><strong>Issue ID:</strong></h5><%= @support_ticket.id %>
+  </div>
+  <br>
+  <div class="field">
+  <h5><strong>Issue Type:</strong></h5>
+    <%= IssueType.find_by_id(@support_ticket.issue_type_id).issue_type %>   
+  </div>
+  <% if @support_ticket.issue_description.present? %>
+    <br>
+    <div class="field">
+      <h5><strong>Issue Description:</strong></h5>
+      <%= @support_ticket.issue_description %>
+    </div>
+  <% end %>
+  <br>
+  <br>
+  <div class="field">
+    <h5><strong>User email:</strong></h5>
+    <%= @support_ticket.user.email %>
+  </div>
+  <br>
+  <div class="field">
+  <h5><strong>Contact number:</strong></h5>
+    <%= @support_ticket.user.mobile_no %>   
+  </div>
+  <br>
+  <div class="field">
+  <h5><strong>Issue lodged on:</strong></h5>
+    <%= @support_ticket.created_at %>   
+  </div>
+
+</div>
+

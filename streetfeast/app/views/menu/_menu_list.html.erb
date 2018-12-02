@@ -1,0 +1,257 @@
+<div id ="main_page">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+
+<div style="padding: 10px;">
+<center><h4><b>Menu</b></h4></center>
+
+<table class="table table-hover" id="menu_list_datatable">
+  <thead>
+    <tr class="table-info">
+      <th scope="col">id</th>
+      <th scope="col"><h5>Item Name</h5></th>
+      <th scope="col"><h5>Price(rs)</h5></th>
+      <% if user_signed_in? %>
+        <% if current_user.is_admin == true %>
+          <th></th>
+          <th></th>
+        <% end %>
+      <% end %>
+    </tr>
+  </thead>
+    <tbody>
+      <% if user_signed_in? %>
+        <% if current_user.is_admin.eql? true %>
+          <tr>
+          <% @menu_for_restaurant.order('id ASC').each do |menu| %>
+              <td><%= menu.id %></td>
+              <td><%= menu.item_name %></td>
+              <td><%#= menu.price %><%= text_field_tag "item_name","#{menu.price}",:class=>"form-control",:disabled=>"disabled",:id=>"price_#{menu.id}",:style=>"max-width:100px;" %></td>
+              <% if user_signed_in? %>
+                <% if current_user.is_admin == true %>
+                  <td><a><img src="/assets/edit_icon.png" style="height: 17px;width:17px;" data-id="<%=menu.id%>" class="edit_price edit_price_<%=menu.id%>" data-value="<%=menu.price%>"></a><a><img src="/assets/save.png" style="height: 17px;width:17px;" data-id="<%=menu.id%>" data-value="<%=menu.price%>" class="save_price_<%=menu.id%> save_price"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a><img src="/assets/delete.png" style="height: 17px;width:17px;" data-id="<%=menu.id%>" data-value="<%=menu.price%>" class="delete_changes delete_changes_<%=menu.id%>"></a></td>
+                  <% if menu.is_available.eql? true %>
+                    <td><span class="badge badge-success size-mid is_available" data-id="<%= menu.id %>"  style="cursor: pointer;">Available</span></td>
+                  <% else %>
+                    <td><span class="badge badge-danger size-mid is_available" data-id="<%= menu.id %>" style="cursor: pointer;">Not Available</span></td>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </tr>
+          <% end %>
+        <% else %>
+          <% @menu_for_restaurant.where("is_available=?",true).each do |menu| %>
+            <tr>
+              <td><%= menu.id %></td>
+              <td><%= menu.item_name %></td>
+              <td><%= menu.price %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      <% else %>
+        <% @menu_for_restaurant.where("is_available=?",true).each do |menu| %>
+          <tr>
+            <td><%= menu.id %></td>
+            <td><%= menu.item_name %></td>
+            <td><%= menu.price %></td>
+          </tr>
+        <% end %>
+      <% end %>
+  </tbody>
+</table>
+
+
+<% if user_signed_in? %>
+  <% if current_user.is_admin == true %>
+    <%= form_for @menu,:url=>"/menu/create/#{@restaurant.id}"  do |menu| %>
+      <div class="menu_list">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="field">
+              <%= menu.text_field :item_name,:class=>"form-control",:placeholder => "Item name",:id=>"item_name",:required=> true%>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="field">
+              <%= menu.text_field :price,:class=>"form-control",:placeholder => "Price" ,:id =>"price",:required=> true %>
+            </div>
+          </div>
+        </div>
+        <br>
+      </div>
+    <% end %>
+    <div class="field">
+      <%= button_tag "Add more",:id => "add_more",:class=>"btn btn-danger" %>
+    </div>
+    <br>
+    <div class="field">
+      <%= button_tag "Add to menu",:id => "add_to_menu",:class=>"btn btn-success" %>
+    </div>
+  <% end %>
+<% end %>
+
+
+<script type="text/javascript">
+
+  $(".is_available").on("click",function(){
+    var id = $(this).data('id');
+
+    if ($(this).text() == "Available")
+    {
+      $(this).text("Not Available")
+    }
+    else
+    {
+      $(this).addClass("badge-success")
+      $(this).text("Available");
+    }
+    $(this).toggleClass("badge-danger");
+
+    $.ajax({ type: "get", 
+      url: "/menu/is_available/"+id, 
+      data: {id: id},
+      success: function(response) 
+      { 
+        
+      } 
+    }); 
+  });
+  var field_len=1;
+  $("#item_name").last().attr("name","menu_item_name[item_name1]");
+  $("#price").last().attr("name","menu_item_price[price1]");
+  x=1;
+  $("#add_more").on("click",function(e){
+    max_field = 100;
+    field_len = $('.menu_list').length;
+    if(x < max_field){
+      x++;
+      var html = $(".menu_list").first().clone();
+      $(".menu_list").last().after(html);
+      $('#item_name').val('');
+      $('#price').val('');
+      $("#item_name").last().attr("name","menu_item_name[item_name"+(field_len+1)+"]");
+      $("#price").last().attr("name","menu_item_price[price"+(field_len+1)+"]");
+    }
+  });
+
+
+  $("#add_to_menu").on("click",function(){
+    $("#new_menu").submit();
+  });
+
+  $("#new_menu").on("submit", function(event)
+  {
+    event.preventDefault();
+    
+    var submit = true; 
+
+    $('.menu_list').each(function(index)
+    {
+
+      var item_price = $('[name="menu_item_price[price'+(index+1)+']"]').val();
+      var item_name = $('[name="menu_item_name[item_name'+(index+1)+']"]').val();
+
+      if(item_name=="" && item_price==""){
+        alert("Fill in the details!!")
+      }
+      else{
+        submit = false;
+      }
+    });
+
+    if(submit == false)
+    {
+      $.ajax({ 
+        type: "POST", 
+        url: $("#new_menu").attr('action'), 
+        data: $("#new_menu").serialize(),
+        success: function(response) 
+        { 
+          $("#main_page").html(response); 
+          $('#item_name').val('');
+          $('#price').val('');
+        } 
+      });
+      return false;
+    }
+  });
+
+  // if(item_name=="" && item_price=="")
+  // {
+  //   alert("please write item name and price before submitting!!!");
+  // }
+  // else if (item_name!="" && item_price=="")
+  // {
+  //   alert("Please put item price!!")
+  // }
+  // else if(item_price!="" && item_name==""){
+  //   alert("please put item name!!!");
+  // }
+  // else if(item_name!="" && item_price!="")
+  // {
+    
+  //   $.ajax({ 
+  //     type: "POST", 
+  //     url: $("#new_menu").attr('action'), 
+  //     data: $("#new_menu").serialize(),
+  //     success: function(response) 
+  //     { 
+  //       $("#main_page").html(response); 
+  //       $('#item_name').val('');
+  //       $('#price').val('');
+  //     } 
+  //   });
+  //   return false;
+  // }
+
+
+  $(".edit_price").click(function()
+  {
+    var id = $(this).data("id");
+    $("#price_"+id).attr("disabled",false);
+    $(this).hide();
+    $(".delete_changes_"+id).show();
+    $(".save_price_"+id).show();
+  });
+
+
+  $(document).ready(function(){
+    $(".delete_changes").hide();
+    $(".save_price").hide();
+  });
+
+
+  $(".delete_changes").click(function(){
+    var id=$(this).data("id");
+    $(".delete_changes_"+id).hide();
+    $(".save_price_"+id).hide();
+    $(".edit_price_"+id).show();
+    $("#price_"+id).attr("disabled",true);
+    $("#price_"+id).val($(this).data("value"));
+  });
+  $(".save_price").click(function()
+  {
+    var id=$(this).data("id");
+    var new_price = $("#price_"+id).val();
+    $.ajax({ 
+      type: "POST", 
+      url: "/menu/edit_price", 
+      data: {menu_id: id,price: new_price},
+      success: function(response) 
+      { 
+        $("#price_"+response.id).val(response.price);
+        $("#price_"+response.id).attr("disabled",true);
+        $("#price_"+id).attr("data-value",response.price);
+        $(".delete_changes_"+response.id).hide();
+        $(".save_price_"+response.id).hide();
+        $(".edit_price_"+response.id).show();
+        $(".delete_changes_"+response.id).attr("data-value",response.price);
+        $(".save_price_"+response.id).attr("data-value",response.price);
+        $(".edit_price_"+response.id).attr("data-value",response.price);
+      } 
+    });
+  });
+
+
+</script>
+</div>

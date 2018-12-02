@@ -1,0 +1,166 @@
+<link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></link>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+<div style="padding: 10px;">
+  <table id="subsriptions_datatable" class="table table-hover display responsive no-wrap" data-source="<%= subscriptions_path(format: :json) %>">
+    <thead>
+      <tr>
+        <th scope="col"><input type="checkbox" name="select_all_checkbox" id="select_all"></th>
+        <th scope="col">Email ID</th>
+      </tr>
+    </thead>
+    <tbody>  
+    </tbody>
+  </table> 
+  <button class="btn btn-success right-align newsletter_btn" >Send Newsletter</button>
+</div>
+<script>
+
+  jQuery(document).ready(function() 
+  {
+    $('#subsriptions_datatable').dataTable({
+      "serverSide": true,
+      "pagingType": "full_numbers",
+      "oLanguage": { "sSearch": ""},
+      "columnDefs": [
+         { "orderable": false, "targets": 0 }
+        // { "orderable": false, "targets": 3 },
+
+      ],
+      "ajax":{
+        "url":$('#subsriptions_datatable').data('source'),
+        "data": function (d) {
+        }
+      },
+      "preDrawCallback": function(settings) 
+      {
+        $('#subsriptions_datatable_filter input[type="search"]').attr("placeholder","Search");
+        $(".loader").show();
+      },
+      "initComplete": function(settings, json) {
+
+      
+      },
+      "drawCallback": function(settings) 
+      {
+        $(".loader").hide();
+        initialize_script();
+        count_rows=0;
+        var x = $('#select_all').prop('checked');
+        if(x==true)
+        {
+          $('#select_all').prop('checked',false);
+        }
+      },
+    })
+  });
+
+  var user_ids=[];
+  var count_rows=0;
+  var c_rows;
+
+  function initialize_script()
+  {
+    $('#select_all').on("click",function() {
+      var rows,checked,each_user_id;
+      user_ids=[];
+
+      rows = $('#subsriptions_datatable').find('tbody tr').find('input');
+
+      c_rows = rows.length;
+      count_rows=rows.length;
+      checked = $(this).prop('checked');
+      
+      $( ".is_checked_subscription" ).each(function() {
+
+        $(this).prop('checked',checked);
+
+        each_user_id =$(this).attr("data-id") ;
+
+        if(checked==true)
+        {
+          user_ids.push(parseInt(each_user_id));
+        }
+        else
+        {
+          user_ids.pop();
+          count_rows--;
+          if(c_rows!=count_rows){
+            $('#select_all').attr('checked',false);
+          }
+        }
+      });
+    });
+
+
+    $(".is_checked_subscription").on("click",function()
+    {
+      var rows,c_rows;
+      rows = $('#subsriptions_datatable').find('tbody tr').find('input');
+      c_rows = rows.length;
+      var id = $(this).data('id');
+      var x = $("#sc_"+id).prop('checked');
+      
+      if(x == false)
+      {
+        var index = user_ids.indexOf(id);
+        if (index !== -1) 
+          user_ids.splice(index, 1);
+        count_rows--;
+        if(c_rows!=count_rows){
+          var ch = $('#select_all');
+          ch.prop('checked', false);
+        }
+      }
+      else
+      {
+        user_ids.push(id);
+
+        count_rows++;
+        if(c_rows == count_rows){
+          var ch = $('#select_all');
+          ch.prop('checked', true);
+        }
+      }
+    });
+
+    $(".newsletter_btn").click(function(){
+      $(".newsletter_btn").attr("disabled","true");
+      if(user_ids.length==0)
+      {
+        swal("Please select atleast one user","", "error");
+        $(".newsletter_btn").removeAttr("disabled");
+
+      }
+      else
+      {
+        $(".loader").show();
+        $.ajax({ 
+          async: true,
+          type: 'GET',
+          url: "/subscriptions/send_newsletter",
+          data: {user_ids: user_ids},
+          success: function(data)
+          {
+            $(".loader").hide();
+            swal("Newsletters has been sent!!","Email has been sent to the select users...", "success");
+            $(".newsletter_btn").removeAttr("disabled");
+
+          }, 
+          error: function(data){ alert('error'); } 
+        })
+      }
+    })
+  }
+
+</script>
+<style type="text/css">
+  #subsriptions_datatable_filter input[type="search"] 
+  {
+    border: 1px solid #aaa;
+    border-radius: 15px;
+    padding: 5px;
+    outline: none;
+    margin-right: 16px;
+  }
+</style>

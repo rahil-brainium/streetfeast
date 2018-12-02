@@ -1,0 +1,35 @@
+
+# development:
+#   adapter: postgresql
+#   encoding: unicode
+#   database: sfd
+#   pool: 5
+
+# test:
+#   adapter: postgresql
+#   encoding: unicode
+#   database: sfd
+#   pool: 5
+
+
+# production:
+#   adapter: postgresql
+#   encoding: unicode
+#   database: sfd
+#   pool: 5
+
+
+
+############################################ -------------- Rahil's ubuntu version
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: my_development_street
+  pool: 5
+
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: my_test_test
+  pool: 5
